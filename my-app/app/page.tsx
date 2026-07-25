@@ -36,6 +36,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+    
 
       {/* 2. Features Section (dark band, surface-elevated cards) */}
       <section id="features" className="bg-canvas-dark py-band px-6 lg:px-24">
@@ -79,7 +80,7 @@ export default function Home() {
               <div>
                 <h3 className="heading-sm mb-2">Real-time Analytics</h3>
                 <p className="body-sm text-on-dark-mute">
-                  Monitor your portfolio's risk distribution and track prediction trends over time in beautiful dashboards.
+                  Monitor your portfolio&apos;s risk distribution and track prediction trends over time in beautiful dashboards.
                 </p>
               </div>
             </Card>

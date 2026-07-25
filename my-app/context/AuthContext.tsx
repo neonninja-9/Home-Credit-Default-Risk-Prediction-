@@ -25,7 +25,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const storedUser = localStorage.getItem("creditlens_user")
     if (storedUser) {
-      setUser(JSON.parse(storedUser))
+      setTimeout(() => {
+        setUser(JSON.parse(storedUser))
+      }, 0)
     }
   }, [])
 
