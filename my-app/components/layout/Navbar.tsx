@@ -4,6 +4,7 @@ import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/context/AuthContext"
 import { Button } from "@/components/ui/Button"
+import Magnet from "@/components/magnet"
 import { Menu, X, ArrowUpRight, BookOpen, Building2, ChartNoAxesColumn, Rocket, Sparkles, Users } from "lucide-react"
 import { useState, useEffect } from "react"
 import {
@@ -16,10 +17,10 @@ import {
 } from "@/components/ui/motion-navigation-menu"
 
 const PRODUCTS = [
-  { title: "Analytics", desc: "Live funnels, cohorts, and retention." },
-  { title: "Automation", desc: "Trigger workflows from events." },
-  { title: "Insights", desc: "AI recommendations for next steps." },
-  { title: "Reports", desc: "Share snapshots with stakeholders." },
+  { title: "Analytics", desc: "Live funnels, cohorts, and retention.", link: "http://localhost:3001" },
+  { title: "Automation", desc: "Trigger workflows from events.", link: "http://localhost:3001/dashboard/automation" },
+  { title: "Insights", desc: "AI recommendations for next steps.", link: "http://localhost:3001/dashboard/insights" },
+  { title: "Reports", desc: "Share snapshots with stakeholders.", link: "http://localhost:3001/dashboard/reports" },
 ];
 
 const SOLUTIONS = [
@@ -61,22 +62,24 @@ export function Navbar() {
             : "bg-transparent h-20 max-w-full w-full rounded-none mt-0 px-6 lg:px-24"
         )}
       >
-        <div className="flex items-center">
-          <Link href="/" className="font-display font-semibold text-xl tracking-tight mr-8">
-            CreditLens
+        <div className="flex items-center flex-shrink-0">
+          <Link href="/" className="font-display font-semibold text-xl tracking-tight mr-4 lg:mr-8 flex-shrink-0">
+            <span className="inline-flex animate-text-shine bg-[linear-gradient(110deg,#b5b5b5,45%,#ffffff,55%,#b5b5b5)] bg-[length:200%_100%] bg-clip-text text-transparent repeat-infinite">
+              CreditLens
+            </span>
           </Link>
 
           {/* Desktop Nav - Motion Navigation Menu */}
           <div className="hidden lg:block">
             <MotionNavigationMenu
-              viewportClassName="bg-canvas-dark/60 backdrop-blur-xl border border-hairline-dark rounded-xl shadow-2xl"
+              viewportClassName="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl"
             >
               <MotionNavigationMenuList highlightClassName="bg-white/10 rounded-md">
 
                 {!isAuthenticated ? (
                   <>
                     <MotionNavigationMenuItem value="products">
-                      <MotionNavigationMenuTrigger className="text-on-dark hover:text-primary hover:bg-surface-elevated">Products</MotionNavigationMenuTrigger>
+                      <MotionNavigationMenuTrigger className="text-on-dark hover:text-white data-[state=open]:text-white hover:bg-surface-elevated data-[state=open]:bg-surface-elevated">Products</MotionNavigationMenuTrigger>
                       <MotionNavigationMenuContent highlightClassName={highlightClassName}>
                         <div className="grid w-[500px] grid-cols-[1fr_1.25fr] gap-2">
                           <MotionNavigationMenuLink
@@ -95,7 +98,7 @@ export function Navbar() {
                           </MotionNavigationMenuLink>
                           <div className="grid grid-cols-2 gap-0.5">
                             {PRODUCTS.map((product) => (
-                              <MotionNavigationMenuLink key={product.title} href="#">
+                              <MotionNavigationMenuLink key={product.title} href={product.link}>
                                 <span className="flex items-center justify-between gap-2 text-sm font-medium">
                                   {product.title}
                                   <ArrowUpRight className="size-3 text-on-dark-mute" />
@@ -111,7 +114,7 @@ export function Navbar() {
                     </MotionNavigationMenuItem>
 
                     <MotionNavigationMenuItem value="solutions">
-                      <MotionNavigationMenuTrigger className="text-on-dark hover:text-primary hover:bg-surface-elevated">Solutions</MotionNavigationMenuTrigger>
+                      <MotionNavigationMenuTrigger className="text-on-dark hover:text-white data-[state=open]:text-white hover:bg-surface-elevated data-[state=open]:bg-surface-elevated">Solutions</MotionNavigationMenuTrigger>
                       <MotionNavigationMenuContent highlightClassName={highlightClassName}>
                         <div className="w-[380px] space-y-1">
                           <div className="text-on-dark-mute px-2 py-2 text-xs font-medium">
@@ -141,7 +144,7 @@ export function Navbar() {
                     </MotionNavigationMenuItem>
 
                     <MotionNavigationMenuItem value="resources">
-                      <MotionNavigationMenuTrigger className="text-on-dark hover:text-primary hover:bg-surface-elevated">Resources</MotionNavigationMenuTrigger>
+                      <MotionNavigationMenuTrigger className="text-on-dark hover:text-white data-[state=open]:text-white hover:bg-surface-elevated data-[state=open]:bg-surface-elevated">Resources</MotionNavigationMenuTrigger>
                       <MotionNavigationMenuContent highlightClassName={highlightClassName}>
                         <div className="grid w-[460px] grid-cols-2 gap-2">
                           <div className="space-y-0.5">
@@ -201,7 +204,7 @@ export function Navbar() {
                     </MotionNavigationMenuItem>
 
                     <MotionNavigationMenuItem>
-                      <MotionNavigationMenuLink href="/dashboard/analytics" className="flex h-9 items-center px-4 py-2 text-sm font-medium text-on-dark hover:bg-surface-elevated rounded-md">
+                      <MotionNavigationMenuLink href="http://localhost:3001" className="flex h-9 items-center px-4 py-2 text-sm font-medium text-on-dark hover:bg-surface-elevated rounded-md">
                         Analytics
                       </MotionNavigationMenuLink>
                     </MotionNavigationMenuItem>
@@ -215,9 +218,11 @@ export function Navbar() {
         <div className="hidden lg:flex items-center gap-4">
           {!isAuthenticated ? (
             <>
-              <Link href="/login" className="button-sm hover:text-primary transition-colors">Log in</Link>
-              <Link href="/register">
-                <Button variant="primary">Get started</Button>
+              <Link href="/auth/login" className="button-sm hover:text-primary transition-colors">Log in</Link>
+              <Link href="/auth/signup">
+                <Magnet padding={50} magnetStrength={3}>
+                  <Button variant="primary">Get started</Button>
+                </Magnet>
               </Link>
             </>
           ) : (
@@ -241,9 +246,11 @@ export function Navbar() {
                 <Link href="#features" className="button-md" onClick={() => setIsMobileMenuOpen(false)}>Features</Link>
                 <Link href="#how-it-works" className="button-md" onClick={() => setIsMobileMenuOpen(false)}>How it works</Link>
                 <div className="h-[1px] w-full bg-hairline-dark my-2"></div>
-                <Link href="/login" className="button-md" onClick={() => setIsMobileMenuOpen(false)}>Log in</Link>
-                <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button variant="primary" className="w-full">Get started</Button>
+                <Link href="/auth/login" className="button-md" onClick={() => setIsMobileMenuOpen(false)}>Log in</Link>
+                <Link href="/auth/signup" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Magnet padding={30} magnetStrength={2}>
+                    <Button variant="primary" className="w-full">Get started</Button>
+                  </Magnet>
                 </Link>
               </>
             ) : (

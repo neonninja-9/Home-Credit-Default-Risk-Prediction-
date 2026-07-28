@@ -1,38 +1,50 @@
 import { NextResponse } from "next/server"
+import { prisma } from "@/lib/db"
+import bcrypt from "bcryptjs"
 
-export async function POST(request: Request) {
+export async function POST(req: Request) {
   try {
-    const body = await request.json()
-    const { name, email, password } = body
+    const { name, email, password } = await req.json()
 
     if (!name || !email || !password) {
       return NextResponse.json(
-        { error: "Name, email, and password are required" },
+        { message: "Missing required fields" },
         { status: 400 }
       )
     }
 
-    // Mock successful registration
-    // In a real app, you would check if email exists, hash password, and save to DB
-    
-    const newUser = {
-      id: Math.random().toString(36).substring(7),
-      name,
-      email,
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
+    })
+
+    if (existingUser) {
+      return NextResponse.json(
+        { message: "User with this email already exists" },
+        { status: 409 }
+      )
     }
 
-    const token = `mock-jwt-token-${Date.now()}`
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 12)
+
+    // Create user
+    const newUser = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+      },
+    })
 
     return NextResponse.json(
-      {
-        user: newUser,
-        token,
-      },
+      { message: "User created successfully", user: { id: newUser.id, name: newUser.name, email: newUser.email } },
       { status: 201 }
     )
   } catch (error) {
+    console.error("Registration error:", error)
     return NextResponse.json(
-      { error: "Internal server error" },
+      { message: "Something went wrong" },
       { status: 500 }
     )
   }

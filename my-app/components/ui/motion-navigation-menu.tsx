@@ -654,6 +654,23 @@ function MotionNavigationMenuViewport({
       animate={{ left: context?.viewportX ?? "50%" }}
       transition={context?.spring}
     >
+      {/* Background/Blur layer (avoids overflow-hidden CSS bug) */}
+      <motion.div
+        initial={false}
+        animate={{
+          width: activeContent ? width : 0,
+          height: activeContent ? height : 0,
+          opacity: activeContent ? 1 : 0,
+          scale: activeContent ? 1 : 0.95,
+        }}
+        transition={context?.spring}
+        className={cn(
+          "absolute mt-1.5 rounded-md shadow",
+          className,
+        )}
+      />
+
+      {/* Content layer (handles clipping, no background) */}
       <motion.div
         data-slot="navigation-menu-viewport"
         initial={false}
@@ -664,10 +681,7 @@ function MotionNavigationMenuViewport({
           scale: activeContent ? 1 : 0.95,
         }}
         transition={context?.spring}
-        className={cn(
-          "text-on-dark relative mt-1.5 overflow-hidden rounded-md shadow",
-          className,
-        )}
+        className="text-on-dark relative mt-1.5 overflow-hidden rounded-md"
       >
         <AnimatePresence
           mode="popLayout"
