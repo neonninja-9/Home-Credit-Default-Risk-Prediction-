@@ -7,31 +7,33 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  password      String?
-  accounts      Account[]
-  sessions      Session[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id               String            @id @default(cuid())
+  name             String?
+  email            String?           @unique
+  emailVerified    DateTime?
+  image            String?
+  password         String?
+  role             String            @default("CUSTOMER") // "CUSTOMER" | "BANK_OFFICER"
+  accounts         Account[]
+  sessions         Session[]
+  loanApplications LoanApplication[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
 }
 
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?
-  access_token       String?
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?
-  session_state      String?
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -52,4 +54,47 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model LoanApplication {
+  id                 String   @id @default(cuid())
+  loanId             String   @unique // e.g. "HC-849204"
+  userId             String?
+  user               User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  // Applicant Demographics & Personal Details
+  applicantName      String
+  age                Int
+  gender             String
+  maritalStatus      String
+  education          String
+  employmentType     String
+  yearsEmployed      Float
+  children           Int      @default(0)
+  familyMembers      Int      @default(1)
+
+  // Financial & Asset Information
+  annualIncome       Float
+  loanAmount         Float
+  loanAnnuity        Float
+  goodsPrice         Float
+  housingType        String
+  ownCar             Boolean  @default(false)
+  ownRealty          Boolean  @default(false)
+
+  // ML Prediction Results & Explainability
+  defaultProbability Float    // 0.0 to 1.0 (or percentage)
+  riskLevel          String   // "Low" | "Medium" | "High"
+  recommendation     String   // "Approve" | "Manual Review" | "Reject"
+  confidence         Float?
+  shapValues         Json?    // Array of { feature, value, impact }
+
+  // Application & Bank Review Status
+  status             String   @default("PENDING") // "PENDING" | "APPROVED" | "REJECTED"
+  bankRemarks        String?
+  reviewedBy         String?
+  reviewedAt         DateTime?
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 }

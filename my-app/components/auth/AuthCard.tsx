@@ -1,13 +1,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { signIn } from "next-auth/react"
+import { signIn, getSession } from "next-auth/react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
-import { Mail, ArrowLeft } from "lucide-react"
+import { Mail, ArrowLeft, User, Building2, ShieldCheck, Sparkles } from "lucide-react"
 
 const GithubIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -30,6 +30,8 @@ interface AuthCardProps {
   initialMode?: "login" | "signup"
 }
 
+type RoleType = "CUSTOMER" | "BANK_OFFICER"
+
 // Fluid spring configuration for buttery smooth natural motion
 const springTransition = {
   type: "spring" as const,
@@ -45,12 +47,25 @@ const textTransition = {
 
 export function AuthCard({ initialMode = "login" }: AuthCardProps) {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  
   const [mode, setMode] = useState<"login" | "signup">(initialMode)
+  const [role, setRole] = useState<RoleType>("CUSTOMER")
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+
+  // Detect role from URL query param if present
+  useEffect(() => {
+    const roleParam = searchParams.get("role")?.toLowerCase()
+    if (roleParam === "bank" || roleParam === "bank_officer" || roleParam === "officer") {
+      setRole("BANK_OFFICER")
+    } else if (roleParam === "customer") {
+      setRole("CUSTOMER")
+    }
+  }, [searchParams])
 
   useEffect(() => {
     setMode(initialMode)
@@ -59,7 +74,15 @@ export function AuthCard({ initialMode = "login" }: AuthCardProps) {
   const toggleMode = (newMode: "login" | "signup") => {
     setError("")
     setMode(newMode)
-    window.history.pushState(null, "", newMode === "login" ? "/auth/login" : "/auth/signup")
+    const roleQuery = role === "BANK_OFFICER" ? "?role=bank" : ""
+    window.history.pushState(null, "", (newMode === "login" ? "/auth/login" : "/auth/signup") + roleQuery)
+  }
+
+  const handleRoleChange = (newRole: RoleType) => {
+    setError("")
+    setRole(newRole)
+    const roleQuery = newRole === "BANK_OFFICER" ? "?role=bank" : ""
+    window.history.pushState(null, "", (mode === "login" ? "/auth/login" : "/auth/signup") + roleQuery)
   }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -67,12 +90,14 @@ export function AuthCard({ initialMode = "login" }: AuthCardProps) {
     setLoading(true)
     setError("")
 
+    const targetUrl = role === "BANK_OFFICER" ? "/bank" : "/customer"
+
     try {
       if (mode === "signup") {
         const res = await fetch("/api/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, password }),
+          body: JSON.stringify({ name, email, password, role }),
         })
 
         if (!res.ok) {
@@ -90,7 +115,7 @@ export function AuthCard({ initialMode = "login" }: AuthCardProps) {
           throw new Error(signInRes.error)
         }
 
-        router.push("/customer")
+        router.push(targetUrl)
         router.refresh()
       } else {
         const res = await signIn("credentials", {
@@ -103,7 +128,12 @@ export function AuthCard({ initialMode = "login" }: AuthCardProps) {
           throw new Error(res.error)
         }
 
-        router.push("/customer")
+        // Fetch active session to check registered user role
+        const session = await getSession()
+        const userRole = (session?.user as any)?.role || role
+        const destination = userRole === "BANK_OFFICER" ? "/bank" : "/customer"
+
+        router.push(destination)
         router.refresh()
       }
     } catch (err: any) {
@@ -130,41 +160,112 @@ export function AuthCard({ initialMode = "login" }: AuthCardProps) {
         transition={{
           layout: springTransition,
         }}
-        className="w-full max-w-[448px] mx-auto rounded-cards p-8 sm:p-9 bg-graphite border border-hairline text-bone shadow-[0_16px_56px_rgba(0,0,0,0.6)] overflow-hidden"
+        className="w-full max-w-[460px] mx-auto rounded-cards p-8 sm:p-9 bg-graphite border border-hairline text-bone shadow-[0_16px_56px_rgba(0,0,0,0.6)] overflow-hidden"
       >
+        {/* Role Switcher Tabs */}
+        <motion.div layout="position" transition={springTransition} className="mb-6">
+          <div className="flex p-1 bg-void-canvas/70 rounded-ui border border-hairline/80 relative">
+            <button
+              type="button"
+              onClick={() => handleRoleChange("CUSTOMER")}
+              className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 text-xs font-medium rounded-ui transition-colors duration-200 relative z-10 ${
+                role === "CUSTOMER" ? "text-bone" : "text-slate hover:text-bone/80"
+              }`}
+            >
+              <User className="w-3.5 h-3.5" />
+              <span>Customer Portal</span>
+              {role === "CUSTOMER" && (
+                <motion.div
+                  layoutId="active-role-pill"
+                  transition={springTransition}
+                  className="absolute inset-0 bg-dusk-violet/25 border border-dusk-violet/50 rounded-ui -z-10 shadow-sm"
+                />
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleRoleChange("BANK_OFFICER")}
+              className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 text-xs font-medium rounded-ui transition-colors duration-200 relative z-10 ${
+                role === "BANK_OFFICER" ? "text-bone" : "text-slate hover:text-bone/80"
+              }`}
+            >
+              <Building2 className="w-3.5 h-3.5" />
+              <span>Bank Staff Portal</span>
+              {role === "BANK_OFFICER" && (
+                <motion.div
+                  layoutId="active-role-pill"
+                  transition={springTransition}
+                  className="absolute inset-0 bg-accent-teal/20 border border-accent-teal/40 rounded-ui -z-10 shadow-sm"
+                />
+              )}
+            </button>
+          </div>
+        </motion.div>
+
         {/* Animated Header */}
         <motion.div layout="position" transition={springTransition} className="relative mb-8 text-center min-h-[64px] flex flex-col justify-center">
           <AnimatePresence mode="wait" initial={false}>
             {mode === "login" ? (
               <motion.div
-                key="login-header"
+                key={`login-header-${role}`}
                 initial={{ opacity: 0, y: -8, filter: "blur(6px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 exit={{ opacity: 0, y: 8, filter: "blur(6px)" }}
                 transition={textTransition}
-                className="space-y-2"
+                className="space-y-1.5"
               >
-                <h1 className="text-3xl font-display font-bold tracking-tight text-bone">
-                  Welcome back
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium tracking-wide uppercase mb-1 bg-white/5 border border-white/10 text-slate">
+                  {role === "BANK_OFFICER" ? (
+                    <>
+                      <ShieldCheck className="w-3 h-3 text-accent-teal" />
+                      <span>Bank Underwriting</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-3 h-3 text-dusk-violet" />
+                      <span>Borrower Access</span>
+                    </>
+                  )}
+                </div>
+                <h1 className="text-2xl sm:text-3xl font-display font-bold tracking-tight text-bone">
+                  {role === "BANK_OFFICER" ? "Bank Staff Sign In" : "Welcome back"}
                 </h1>
-                <p className="text-sm text-slate">
-                  Enter your email to sign in to your account
+                <p className="text-xs sm:text-sm text-slate">
+                  {role === "BANK_OFFICER"
+                    ? "Sign in to review and assess loan risk applications"
+                    : "Enter your credentials to access your customer dashboard"}
                 </p>
               </motion.div>
             ) : (
               <motion.div
-                key="signup-header"
+                key={`signup-header-${role}`}
                 initial={{ opacity: 0, y: -8, filter: "blur(6px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 exit={{ opacity: 0, y: 8, filter: "blur(6px)" }}
                 transition={textTransition}
-                className="space-y-2"
+                className="space-y-1.5"
               >
-                <h1 className="text-3xl font-display font-bold tracking-tight text-bone">
-                  Create an account
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium tracking-wide uppercase mb-1 bg-white/5 border border-white/10 text-slate">
+                  {role === "BANK_OFFICER" ? (
+                    <>
+                      <ShieldCheck className="w-3 h-3 text-accent-teal" />
+                      <span>Bank Staff Registration</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-3 h-3 text-dusk-violet" />
+                      <span>New Customer Account</span>
+                    </>
+                  )}
+                </div>
+                <h1 className="text-2xl sm:text-3xl font-display font-bold tracking-tight text-bone">
+                  {role === "BANK_OFFICER" ? "Register Bank Officer" : "Create an account"}
                 </h1>
-                <p className="text-sm text-slate">
-                  Enter your email below to create your account
+                <p className="text-xs sm:text-sm text-slate">
+                  {role === "BANK_OFFICER"
+                    ? "Register your officer credentials to start underwriting"
+                    : "Enter your details to check loan eligibility and apply"}
                 </p>
               </motion.div>
             )}
@@ -194,11 +295,11 @@ export function AuthCard({ initialMode = "login" }: AuthCardProps) {
                   <Input
                     id="name"
                     name="name"
-                    placeholder="Full Name"
+                    placeholder={role === "BANK_OFFICER" ? "Officer Name (e.g. Sarah Jenkins)" : "Full Name"}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required={mode === "signup"}
-                    className="w-full"
+                    className="w-full bg-void-canvas/90 border-hairline focus-visible:border-dusk-violet focus-visible:ring-1 focus-visible:ring-dusk-violet text-bone placeholder:text-slate/60 text-sm h-11"
                   />
                 </div>
               </motion.div>
@@ -211,11 +312,11 @@ export function AuthCard({ initialMode = "login" }: AuthCardProps) {
               id="email"
               name="email"
               type="email"
-              placeholder="m@example.com"
+              placeholder={role === "BANK_OFFICER" ? "officer@bank.com" : "name@example.com"}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full"
+              className="w-full bg-void-canvas/90 border-hairline focus-visible:border-dusk-violet focus-visible:ring-1 focus-visible:ring-dusk-violet text-bone placeholder:text-slate/60 text-sm h-11"
             />
           </motion.div>
 
@@ -225,117 +326,153 @@ export function AuthCard({ initialMode = "login" }: AuthCardProps) {
               id="password"
               name="password"
               type="password"
-              placeholder="Password"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full"
+              className="w-full bg-void-canvas/90 border-hairline focus-visible:border-dusk-violet focus-visible:ring-1 focus-visible:ring-dusk-violet text-bone placeholder:text-slate/60 text-sm h-11"
             />
           </motion.div>
 
-          {/* Error Message */}
+          {/* Error Message with spring animation */}
           <AnimatePresence>
             {error && (
               <motion.div
-                initial={{ opacity: 0, height: 0, y: -4 }}
-                animate={{ opacity: 1, height: "auto", y: 0 }}
-                exit={{ opacity: 0, height: 0, y: -4 }}
+                initial={{ opacity: 0, height: 0, scale: 0.96 }}
+                animate={{ opacity: 1, height: "auto", scale: 1 }}
+                exit={{ opacity: 0, height: 0, scale: 0.96 }}
                 transition={{ duration: 0.2 }}
                 className="overflow-hidden"
               >
-                <p className="text-sm text-red-500">{error}</p>
+                <div className="p-3 text-xs text-rose-300 bg-rose-950/40 border border-rose-800/50 rounded-ui text-center">
+                  {error}
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
 
-          {/* Submit button with smooth position tracking and tap feel */}
-          <motion.div layout="position" transition={springTransition} className="w-full pt-2">
+          {/* Submit Button */}
+          <motion.div layout="position" transition={springTransition} className="pt-2">
             <Button
               type="submit"
-              variant="primary"
-              className="w-full transition-transform active:scale-[0.98]"
               disabled={loading}
+              className={`w-full text-white font-medium h-11 transition-all duration-300 shadow-md ${
+                role === "BANK_OFFICER"
+                  ? "bg-accent-teal hover:bg-accent-teal/90 text-void-canvas font-semibold shadow-accent-teal/10"
+                  : "bg-dusk-violet hover:bg-dusk-violet/90 text-white shadow-dusk-violet/20"
+              }`}
             >
               <AnimatePresence mode="wait" initial={false}>
-                <motion.span
-                  key={mode + (loading ? "-loading" : "-idle")}
-                  initial={{ opacity: 0, y: -6, filter: "blur(2px)" }}
-                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  exit={{ opacity: 0, y: 6, filter: "blur(2px)" }}
-                  transition={{ duration: 0.18, ease: "easeOut" }}
-                >
-                  {loading
-                    ? mode === "login"
-                      ? "Signing in..."
-                      : "Creating account..."
-                    : mode === "login"
-                    ? "Sign in"
-                    : "Sign up"}
-                </motion.span>
+                {loading ? (
+                  <motion.span
+                    key="loading"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.15 }}
+                  >
+                    Processing...
+                  </motion.span>
+                ) : mode === "login" ? (
+                  <motion.span
+                    key={`login-btn-${role}`}
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    {role === "BANK_OFFICER" ? "Access Bank Portal" : "Sign In with Email"}
+                  </motion.span>
+                ) : (
+                  <motion.span
+                    key={`signup-btn-${role}`}
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    {role === "BANK_OFFICER" ? "Register as Bank Staff" : "Create Customer Account"}
+                  </motion.span>
+                )}
               </AnimatePresence>
             </Button>
           </motion.div>
         </form>
 
-        {/* Divider with position tracking */}
-        <motion.div layout="position" transition={springTransition} className="relative my-7 w-full">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-hairline" />
+        {/* Social Login Section */}
+        <motion.div layout="position" transition={springTransition} className="w-full">
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-hairline" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-graphite px-3 text-slate">
+                Or continue with
+              </span>
+            </div>
           </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-graphite px-2 text-slate">Or continue with</span>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() => signIn("github", { callbackUrl: role === "BANK_OFFICER" ? "/bank" : "/customer" })}
+              className="bg-void-canvas/60 border-hairline hover:bg-void-canvas hover:border-slate/40 text-bone h-10 transition-colors duration-200"
+            >
+              <GithubIcon className="mr-2 h-4 w-4 fill-current" />
+              GitHub
+            </Button>
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() => signIn("google", { callbackUrl: role === "BANK_OFFICER" ? "/bank" : "/customer" })}
+              className="bg-void-canvas/60 border-hairline hover:bg-void-canvas hover:border-slate/40 text-bone h-10 transition-colors duration-200"
+            >
+              <Mail className="mr-2 h-4 w-4" />
+              Google
+            </Button>
           </div>
         </motion.div>
 
-        {/* Social Auth Buttons with position tracking */}
-        <motion.div layout="position" transition={springTransition} className="grid grid-cols-2 gap-4 w-full">
-          <Button variant="outline" type="button" onClick={() => signIn("github")} className="w-full transition-transform active:scale-[0.98]">
-            <GithubIcon className="mr-2 h-4 w-4" />
-            Github
-          </Button>
-          <Button variant="outline" type="button" onClick={() => signIn("google")} className="w-full transition-transform active:scale-[0.98]">
-            <Mail className="mr-2 h-4 w-4" />
-            Google
-          </Button>
-        </motion.div>
-
-        {/* Toggle Switcher with position tracking */}
-        <motion.div layout="position" transition={springTransition} className="mt-8 text-center text-sm text-slate w-full min-h-[24px] flex items-center justify-center">
+        {/* Footer Mode Switcher */}
+        <motion.div layout="position" transition={springTransition} className="mt-8 text-center text-xs text-slate">
           <AnimatePresence mode="wait" initial={false}>
             {mode === "login" ? (
-              <motion.p
-                key="toggle-login"
-                initial={{ opacity: 0, y: -4, filter: "blur(2px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, y: 4, filter: "blur(2px)" }}
-                transition={textTransition}
+              <motion.span
+                key="to-signup"
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.2 }}
+                className="inline-block"
               >
-                Don't have an account?{" "}
+                Don&apos;t have an account?{" "}
                 <button
                   type="button"
                   onClick={() => toggleMode("signup")}
-                  className="text-dusk-violet hover:underline underline-offset-4 font-medium transition-colors cursor-pointer"
+                  className="font-medium text-bone hover:text-white underline underline-offset-4 decoration-hairline hover:decoration-bone transition-all duration-200 ml-1 cursor-pointer"
                 >
                   Sign up
                 </button>
-              </motion.p>
+              </motion.span>
             ) : (
-              <motion.p
-                key="toggle-signup"
-                initial={{ opacity: 0, y: -4, filter: "blur(2px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, y: 4, filter: "blur(2px)" }}
-                transition={textTransition}
+              <motion.span
+                key="to-login"
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.2 }}
+                className="inline-block"
               >
                 Already have an account?{" "}
                 <button
                   type="button"
                   onClick={() => toggleMode("login")}
-                  className="text-dusk-violet hover:underline underline-offset-4 font-medium transition-colors cursor-pointer"
+                  className="font-medium text-bone hover:text-white underline underline-offset-4 decoration-hairline hover:decoration-bone transition-all duration-200 ml-1 cursor-pointer"
                 >
                   Sign in
                 </button>
-              </motion.p>
+              </motion.span>
             )}
           </AnimatePresence>
         </motion.div>

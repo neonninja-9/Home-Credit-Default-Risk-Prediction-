@@ -9,11 +9,13 @@ import DecryptedText from '@/components/DecryptedText'
 import Link from 'next/link'
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
+import { Button } from '@/components/ui/Button'
 
 export default async function Home() {
   const session = await auth()
   if (session?.user) {
-    redirect('/customer')
+    const userRole = (session.user as any)?.role
+    redirect(userRole === "BANK_OFFICER" ? "/bank" : "/customer")
   }
 
   return (
@@ -39,13 +41,20 @@ export default async function Home() {
               parentClassName="!block w-full text-center !whitespace-nowrap"
             />
           </p>
-          <Link href="/auth/signup">
-            <Magnet padding={50} disabled={false} magnetStrength={50}>
-              <button className="bg-snow-white hover:bg-snow-white/90 text-void-canvas px-8 py-4 rounded-full font-semibold text-lg transition-colors shadow-xl">
-                Get started for free
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            <Link href="/auth/signup?role=customer">
+              <Magnet padding={50} disabled={false} magnetStrength={50}>
+                <button className="bg-snow-white hover:bg-snow-white/90 text-void-canvas px-8 py-4 rounded-full font-semibold text-lg transition-colors shadow-xl">
+                  Customer Portal
+                </button>
+              </Magnet>
+            </Link>
+            <Link href="/auth/login?role=bank">
+              <button className="px-7 py-4 rounded-full font-medium text-base text-bone hover:text-white border border-white/20 hover:border-accent-teal hover:bg-accent-teal/10 transition-all">
+                Bank Staff Login →
               </button>
-            </Magnet>
-          </Link>
+            </Link>
+          </div>
         </div>
       </ScrollExpandMedia>
 
@@ -59,59 +68,79 @@ export default async function Home() {
       <section className="w-full py-16 bg-void-canvas relative z-10 overflow-hidden flex items-center justify-center">
         <div className="w-full max-w-[1400px] mx-auto px-6 h-[150px] md:h-[250px]">
           <TextPressure
-            text="CREDIT RISK"
+            text="CREDITLENS"
             flex={true}
-            stroke={false}
             alpha={false}
-            scale={true}
+            stroke={false}
+            width={true}
+            weight={true}
+            italic={true}
             textColor="#ffffff"
             minFontSize={36}
-            className="w-full h-full text-center uppercase"
           />
         </div>
       </section>
 
-      {/* 4. GlareHover Cards Section */}
-      <section className="w-full py-32 px-6 bg-void-canvas relative z-10 flex flex-col items-center justify-center">
-        <h2 className="font-display text-3xl md:text-5xl font-bold text-bone mb-16 text-center">
-          Explore the Features
-        </h2>
-        <div className="flex flex-col md:flex-row gap-10 max-w-[1200px] mx-auto w-full items-center justify-center">
-
-          <GlareHover
-            width="350px"
-            height="450px"
-            background="#111"
-            borderColor="#333"
-            glareColor="#ffffff"
-            className="rounded-2xl flex flex-col items-center justify-center p-8 text-center border border-white/5 overflow-hidden"
+      {/* 4. GlareHover Feature Cards */}
+      <section id="features" className="w-full max-w-7xl mx-auto px-6 py-24 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <GlareHover 
+            glareColor="rgba(255, 255, 255, 0.15)"
+            className="p-8 rounded-2xl bg-graphite/40 border border-white/10 flex flex-col justify-between h-80 backdrop-blur-sm"
           >
-            <div className="w-16 h-16 rounded-full bg-snow-white/20 flex items-center justify-center mb-6">
-              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-dusk-violet"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+            <div>
+              <span className="text-xs uppercase tracking-widest text-dusk-violet font-semibold">01 / ML MODELS</span>
+              <h3 className="text-2xl font-bold mt-4 mb-2">90%+ ROC-AUC</h3>
+              <p className="text-slate text-sm">LightGBM models tuned across 193 features trained on Home Credit default history.</p>
             </div>
-            <h3 className="text-2xl font-bold text-bone mb-4 font-display">Risk Scoring</h3>
-            <p className="text-slate font-light leading-relaxed">
-              Instant, accurate default probability predictions powered by state-of-the-art machine learning models.
-            </p>
+            <div className="text-xs text-bone/40 font-mono">MODEL_PERF_OPTIMIZED</div>
           </GlareHover>
 
-          <GlareHover
-            width="350px"
-            height="450px"
-            background="#111"
-            borderColor="#333"
-            glareColor="#ffffff"
-            className="rounded-2xl flex flex-col items-center justify-center p-8 text-center border border-white/5 overflow-hidden"
+          <GlareHover 
+            glareColor="rgba(255, 255, 255, 0.15)"
+            className="p-8 rounded-2xl bg-graphite/40 border border-white/10 flex flex-col justify-between h-80 backdrop-blur-sm"
           >
-            <div className="w-16 h-16 rounded-full bg-accent-teal/20 flex items-center justify-center mb-6">
-              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent-teal"><path d="M12 20V10"></path><path d="M18 20V4"></path><path d="M6 20v-4"></path></svg>
+            <div>
+              <span className="text-xs uppercase tracking-widest text-accent-teal font-semibold">02 / INTERPRETABILITY</span>
+              <h3 className="text-2xl font-bold mt-4 mb-2">SHAP Values</h3>
+              <p className="text-slate text-sm">Understand every loan approval with granular feature contribution breakdowns.</p>
             </div>
-            <h3 className="text-2xl font-bold text-bone mb-4 font-display">SHAP Explainability</h3>
-            <p className="text-slate font-light leading-relaxed">
-              Understand exactly why a decision was made with feature contribution breakdowns for every prediction.
-            </p>
+            <div className="text-xs text-bone/40 font-mono">TRANSPARENT_DECISIONS</div>
           </GlareHover>
 
+          <GlareHover 
+            glareColor="rgba(255, 255, 255, 0.15)"
+            className="p-8 rounded-2xl bg-graphite/40 border border-white/10 flex flex-col justify-between h-80 backdrop-blur-sm"
+          >
+            <div>
+              <span className="text-xs uppercase tracking-widest text-bone font-semibold">03 / REAL-TIME</span>
+              <h3 className="text-2xl font-bold mt-4 mb-2">&lt; 150ms Latency</h3>
+              <p className="text-slate text-sm">High throughput risk calculation pipeline for instant applicant decisioning.</p>
+            </div>
+            <div className="text-xs text-bone/40 font-mono">LOW_LATENCY_API</div>
+          </GlareHover>
+        </div>
+      </section>
+
+      {/* 5. LaserFlow Call To Action */}
+      <section className="w-full max-w-5xl mx-auto px-6 py-24 relative z-10">
+        <div className="relative w-full h-[400px] rounded-3xl overflow-hidden border border-white/10 flex items-center justify-center text-center p-8 bg-graphite/40 backdrop-blur-md">
+          <div className="absolute inset-0 -z-10">
+            <LaserFlow />
+          </div>
+          <div className="flex flex-col items-center max-w-xl z-10 space-y-6">
+            <h2 className="text-3xl md:text-5xl font-display font-bold text-bone">
+              Ready to automate risk decisions?
+            </h2>
+            <p className="text-slate text-sm md:text-base">
+              Deploy explainable, trustworthy underwriting with CreditLens today.
+            </p>
+            <Link href="/auth/signup?role=customer">
+              <Button variant="primary" className="px-8 py-3.5 text-base">
+                Start Checking Eligibility
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 
