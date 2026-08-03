@@ -6,6 +6,8 @@ import { useAuth } from "@/context/AuthContext"
 import { Button } from "@/components/ui/Button"
 import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
+import { motion, AnimatePresence } from "framer-motion"
+import { Menu, X, LogOut } from "lucide-react"
 
 const NAV_LINKS = [
   { href: "/customer", label: "Portal" },
@@ -16,6 +18,8 @@ const NAV_LINKS = [
 export function AppNavbar() {
   const { logout } = useAuth()
   const [isScrolled, setIsScrolled] = useState(false)
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const pathname = usePathname()
 
   useEffect(() => {
@@ -45,28 +49,114 @@ export function AppNavbar() {
             </span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-1">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  "px-4 py-2 text-sm font-medium rounded-md transition-colors",
-                  pathname === link.href
-                    ? "text-bone bg-frosted-glass"
-                    : "text-bone/70 hover:text-bone hover:bg-frosted-glass"
-                )}
-              >
-                {link.label}
-              </Link>
-            ))}
+          {/* Desktop Nav Items with Sliding Hover Pill */}
+          <div
+            className="hidden md:flex items-center gap-1 relative"
+            onMouseLeave={() => setHoveredIndex(null)}
+          >
+            {NAV_LINKS.map((link, idx) => {
+              const isActive = pathname === link.href
+              const isHovered = hoveredIndex === idx
+
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onMouseEnter={() => setHoveredIndex(idx)}
+                  className={cn(
+                    "relative px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 z-10",
+                    isActive ? "text-bone" : "text-bone/70 hover:text-bone"
+                  )}
+                >
+                  {/* Sliding hover pill across items */}
+                  {isHovered && (
+                    <motion.div
+                      layoutId="app-nav-hover-pill"
+                      className="absolute inset-0 bg-frosted-glass rounded-md z-[-1]"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ type: "spring", bounce: 0.15, duration: 0.35 }}
+                    />
+                  )}
+
+                  {/* Active item highlight when not hovering over another item */}
+                  {isActive && !isHovered && (
+                    <motion.div
+                      layoutId="app-nav-active-pill"
+                      className="absolute inset-0 bg-frosted-glass rounded-md z-[-2] border border-white/5"
+                      transition={{ type: "spring", bounce: 0.15, duration: 0.35 }}
+                    />
+                  )}
+
+                  <span className="relative z-10">{link.label}</span>
+                </Link>
+              )
+            })}
           </div>
         </div>
 
+        {/* Desktop Logout Button */}
         <div className="hidden md:flex items-center">
-          <Button variant="outline-dark" onClick={logout}>Log out</Button>
+          <Button variant="outline-dark" onClick={logout} className="hover:bg-frosted-glass">
+            Log out
+          </Button>
         </div>
+
+        {/* Mobile menu trigger */}
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="md:hidden text-bone p-2 focus:outline-none"
+          aria-label="Toggle menu"
+        >
+          {isMobileMenuOpen ? <X className="size-6" /> : <Menu className="size-6" />}
+        </button>
       </nav>
+
+      {/* Mobile Menu Dropdown */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="pointer-events-auto fixed top-24 left-4 right-4 bg-graphite/95 backdrop-blur-xl border border-hairline rounded-2xl p-6 flex flex-col space-y-4 shadow-2xl z-40 md:hidden text-bone"
+          >
+            <div className="flex flex-col space-y-2">
+              {NAV_LINKS.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={cn(
+                    "px-4 py-3 text-base font-medium rounded-lg transition-colors",
+                    pathname === link.href
+                      ? "bg-frosted-glass text-bone"
+                      : "text-bone/70 hover:text-bone hover:bg-frosted-glass"
+                  )}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+
+            <div className="pt-4 border-t border-hairline">
+              <Button
+                variant="outline-dark"
+                onClick={() => {
+                  setIsMobileMenuOpen(false)
+                  logout()
+                }}
+                className="w-full flex items-center justify-center gap-2"
+              >
+                <LogOut className="size-4" />
+                Log out
+              </Button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

@@ -1,16 +1,19 @@
 import { PrismaClient } from "@prisma/client"
-import { PrismaLibSql } from "@prisma/adapter-libsql"
+import { PrismaPg } from "@prisma/adapter-pg"
+import { Pool } from "pg"
 
 const prismaClientSingleton = () => {
-  const adapter = new PrismaLibSql({
-    url: process.env.DATABASE_URL || "file:./dev.db",
-  })
+  const connectionString =
+    process.env.DATABASE_URL ||
+    "postgresql://postgres:postgrespassword@localhost:5433/creditlens_db?schema=public"
+  const pool = new Pool({ connectionString })
+  const adapter = new PrismaPg(pool)
   return new PrismaClient({ adapter })
 }
 
 declare const globalThis: {
-  prismaGlobal: ReturnType<typeof prismaClientSingleton>;
-} & typeof global;
+  prismaGlobal: ReturnType<typeof prismaClientSingleton> | undefined
+} & typeof global
 
 export const prisma = globalThis.prismaGlobal ?? prismaClientSingleton()
 
