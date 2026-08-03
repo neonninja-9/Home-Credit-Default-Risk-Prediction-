@@ -191,7 +191,7 @@ export function Navbar() {
         <div className="hidden lg:flex items-center gap-4">
           <Link href="/auth/login" className="text-sm font-semibold hover:text-primary transition-colors">Log in</Link>
           <Link href="/auth/signup">
-            <Magnet padding={50} magnetStrength={3}>
+            <Magnet padding={50} magnetStrength={50}>
               <Button variant="primary">Get started</Button>
             </Magnet>
           </Link>

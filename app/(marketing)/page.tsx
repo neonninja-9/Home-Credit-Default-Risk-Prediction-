@@ -3,7 +3,6 @@ import Magnet from '@/components/special-effects/magnet'
 import StickyTextReveal from '@/components/ui/StickyTextReveal'
 import TextPressure from '@/components/special-effects/TextPressure'
 import GlareHover from '@/components/special-effects/GlareHover'
-import LaserFlow from '@/components/special-effects/LaserFlow'
 import AnimatedCreditCards from '@/components/ui/AnimatedCreditCards'
 import DecryptedText from '@/components/special-effects/DecryptedText'
 import Link from 'next/link'
@@ -43,16 +42,11 @@ export default async function Home() {
           </p>
           <div className="flex flex-col sm:flex-row items-center gap-4">
             <Link href="/auth/signup?role=customer">
-              <Magnet padding={50} disabled={false} magnetStrength={50}>
+              <Magnet padding={50} disabled={false} magnetStrength={3}>
                 <button className="bg-snow-white hover:bg-snow-white/90 text-void-canvas px-8 py-4 rounded-full font-semibold text-lg transition-colors shadow-xl">
-                  Customer Portal
+                  Get Started
                 </button>
               </Magnet>
-            </Link>
-            <Link href="/auth/login?role=bank">
-              <button className="px-7 py-4 rounded-full font-medium text-base text-bone hover:text-white border border-white/20 hover:border-accent-teal hover:bg-accent-teal/10 transition-all">
-                Bank Staff Login →
-              </button>
             </Link>
           </div>
         </div>
@@ -122,12 +116,9 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 5. LaserFlow Call To Action */}
+      {/* 5. Call To Action */}
       <section className="w-full max-w-5xl mx-auto px-6 py-24 relative z-10">
         <div className="relative w-full h-[400px] rounded-3xl overflow-hidden border border-white/10 flex items-center justify-center text-center p-8 bg-graphite/40 backdrop-blur-md">
-          <div className="absolute inset-0 -z-10">
-            <LaserFlow />
-          </div>
           <div className="flex flex-col items-center max-w-xl z-10 space-y-6">
             <h2 className="text-3xl md:text-5xl font-display font-bold text-bone">
               Ready to automate risk decisions?
