@@ -1,16 +1,15 @@
 import type { Metadata } from "next";
-import { Inter, Geist } from "next/font/google";
+import { DM_Sans, Geist } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const geist = Geist({ subsets: ['latin'], variable: '--font-geist' });
 
-const inter = Inter({
+const dmSans = DM_Sans({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-dm-sans",
 });
 
 export const metadata: Metadata = {
@@ -24,19 +23,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={cn("h-full", "antialiased", inter.variable, "font-sans", geist.variable)}>
-      <body className="min-h-full flex flex-col bg-canvas-dark text-on-dark font-sans selection:bg-primary selection:text-white">
-        <AuthProvider>
-          <Navbar />
-          <main className="flex-1 flex flex-col w-full">
-            <div className='w-full h-full'>
-              {children}
-            </div>
-          </main>
-          <Footer />
-        </AuthProvider>
+    <html lang="en" suppressHydrationWarning className={cn("h-full", "antialiased", dmSans.variable, geist.variable)}>
+      <body className="min-h-full flex flex-col bg-void-canvas text-bone font-sans selection:bg-dusk-violet selection:text-white">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
 }
-

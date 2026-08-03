@@ -11,12 +11,11 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
       <div
         ref={ref}
         className={cn(
-          "rounded-lg p-8 body-md",
+          "rounded-cards p-[28px] text-body",
           {
-            "bg-surface-card text-ink border border-hairline-light": variant === "feature-light",
-            "bg-surface-elevated text-on-dark": variant === "feature-dark" || variant === "plan",
-            "bg-primary text-on-primary": variant === "plan-featured",
-            "glass text-on-dark": variant === "glass"
+            "bg-graphite text-bone": variant === "feature-light" || variant === "feature-dark" || variant === "plan",
+            "bg-snow-white text-void-canvas": variant === "plan-featured",
+            "bg-frosted-glass backdrop-blur-sm text-bone border border-hairline": variant === "glass"
           },
           className
         )}

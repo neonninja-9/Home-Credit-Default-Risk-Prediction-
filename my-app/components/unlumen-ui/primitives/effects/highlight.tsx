@@ -58,9 +58,9 @@ export const HighlightItem = React.forwardRef<HTMLElement, any>(
         ref,
         onMouseEnter: (e: any) => {
           context?.setHoveredId(id)
-          children.props.onMouseEnter?.(e)
+          ;(children.props as any).onMouseEnter?.(e)
         },
-        className: cn("relative z-10", children.props.className),
+        className: cn("relative z-10", (children.props as any).className),
         children: inner
       } as any)
     }

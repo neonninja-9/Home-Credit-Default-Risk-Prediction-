@@ -6,7 +6,7 @@ export default function BankLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col font-sans">
+    <div className="min-h-screen bg-black text-white flex flex-col font-sans pt-24">
       <div className="w-full border-b border-white/10 bg-surface-dark px-6 py-4 flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <div className="w-8 h-8 rounded bg-primary flex items-center justify-center font-bold text-sm">B</div>

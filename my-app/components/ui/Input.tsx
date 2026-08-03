@@ -12,7 +12,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="w-full flex flex-col gap-1.5">
         {label && (
-          <label htmlFor={id} className="text-sm font-medium text-ink dark:text-on-dark">
+          <label htmlFor={id} className="text-sm font-medium text-bone">
             {label}
           </label>
         )}
@@ -20,15 +20,15 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           id={id}
           type={type}
           className={cn(
-            "flex w-full rounded-md border border-hairline-light bg-canvas-light px-4 py-3.5 h-14 text-ink body-md file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-mute focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50",
-            error && "border-accent-danger focus-visible:ring-accent-danger",
+            "flex w-full rounded-ui border border-hairline bg-void-canvas px-4 py-3.5 h-12 text-bone text-body file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-smoke focus-visible:outline-none focus-visible:border-dusk-violet focus-visible:ring-1 focus-visible:ring-dusk-violet transition-colors disabled:cursor-not-allowed disabled:opacity-50",
+            error && "border-red-500 focus-visible:ring-red-500",
             className
           )}
           ref={ref}
           {...props}
         />
         {error && (
-          <p className="text-sm text-accent-danger">{error}</p>
+          <p className="text-sm text-red-500">{error}</p>
         )}
       </div>
     )
