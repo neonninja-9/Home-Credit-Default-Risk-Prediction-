@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
 import Link from "next/link";
+import { CustomSelect } from "@/components/ui/Select";
 import { motion } from "framer-motion";
 import {
   Search,
@@ -141,33 +142,37 @@ export default function BankDashboard() {
 
         <div className="flex flex-wrap items-center gap-3">
           {/* Status Filter */}
-          <div className="flex items-center gap-1.5 text-xs">
-            <span className="text-white/50">Status:</span>
-            <select
+          <div className="flex items-center gap-1.5 text-xs w-[180px]">
+            <span className="text-white/50 shrink-0">Status:</span>
+            <CustomSelect
+              name="statusFilter"
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="bg-canvas-dark border border-white/10 text-white rounded-md px-2.5 py-1 text-xs focus:outline-none"
-            >
-              <option value="ALL">All Statuses</option>
-              <option value="PENDING">Pending Review</option>
-              <option value="APPROVED">Approved</option>
-              <option value="REJECTED">Rejected</option>
-            </select>
+              theme="teal"
+              options={[
+                { value: "ALL", label: "All Statuses" },
+                { value: "PENDING", label: "Pending Review" },
+                { value: "APPROVED", label: "Approved" },
+                { value: "REJECTED", label: "Rejected" },
+              ]}
+            />
           </div>
 
           {/* Risk Filter */}
-          <div className="flex items-center gap-1.5 text-xs">
-            <span className="text-white/50">Risk Level:</span>
-            <select
+          <div className="flex items-center gap-1.5 text-xs w-[180px]">
+            <span className="text-white/50 shrink-0">Risk Level:</span>
+            <CustomSelect
+              name="riskFilter"
               value={riskFilter}
               onChange={(e) => setRiskFilter(e.target.value)}
-              className="bg-canvas-dark border border-white/10 text-white rounded-md px-2.5 py-1 text-xs focus:outline-none"
-            >
-              <option value="ALL">All Risk Levels</option>
-              <option value="Low">Low Risk (&lt;30%)</option>
-              <option value="Medium">Medium Risk (30-60%)</option>
-              <option value="High">High Risk (&gt;60%)</option>
-            </select>
+              theme="teal"
+              options={[
+                { value: "ALL", label: "All Risk Levels" },
+                { value: "Low", label: "Low Risk (<30%)" },
+                { value: "Medium", label: "Medium Risk (30-60%)" },
+                { value: "High", label: "High Risk (>60%)" },
+              ]}
+            />
           </div>
         </div>
       </div>

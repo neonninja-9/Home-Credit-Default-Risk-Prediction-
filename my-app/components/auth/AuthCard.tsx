@@ -135,11 +135,16 @@ export function AuthCard({ initialMode = "login" }: AuthCardProps) {
         router.refresh()
       }
     } catch (err: any) {
-      setError(mode === "login" ? "Invalid email or password" : (err.message || "Registration failed"))
+      let msg = err.message || "An error occurred"
+      if (msg === "CredentialsSignin") {
+        msg = "Invalid email or password. If you haven't registered this email, please sign up."
+      }
+      setError(msg)
     } finally {
       setLoading(false)
     }
   }
+
 
   const isBank = role === "BANK_OFFICER"
   const accentColor = isBank ? "accent-teal" : "dusk-violet"

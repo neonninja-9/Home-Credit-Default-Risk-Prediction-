@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import {
   Highlight,
   HighlightItem,
-} from "@/components/unlumen-ui/primitives/effects/highlight";
+} from "@/components/special-effects/highlight";
 
 type Spring = {
   type: "spring";

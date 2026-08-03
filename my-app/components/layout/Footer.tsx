@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link"
-import LaserFlow from "@/components/LaserFlow"
+import LaserFlow from "@/components/special-effects/LaserFlow"
 
 export function Footer() {
   return (

@@ -9,14 +9,15 @@ import bcrypt from "bcryptjs"
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt" },
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || "creditlens_super_secret_auth_key_2026_key",
   providers: [
     GitHubProvider({
-      clientId: process.env.GITHUB_ID!,
-      clientSecret: process.env.GITHUB_SECRET!,
+      clientId: process.env.GITHUB_ID || "dummy",
+      clientSecret: process.env.GITHUB_SECRET || "dummy",
     }),
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: process.env.GOOGLE_CLIENT_ID || "dummy",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "dummy",
     }),
     CredentialsProvider({
       name: "Credentials",

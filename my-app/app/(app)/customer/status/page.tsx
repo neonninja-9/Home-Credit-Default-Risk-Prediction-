@@ -69,15 +69,11 @@ function StatusContent() {
     <div className="max-w-3xl mx-auto flex flex-col space-y-8 animate-in fade-in duration-500 pb-16">
       {/* Header */}
       <div className="flex flex-col space-y-2 text-center">
-        <div className="inline-flex items-center justify-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-dusk-violet/15 text-dusk-violet border border-dusk-violet/30 w-fit mx-auto">
-          <Clock className="w-3.5 h-3.5" />
-          <span>Real-time Application Tracking</span>
-        </div>
         <h1 className="text-3xl md:text-4xl font-display font-bold tracking-tight text-white">
-          Loan Application Status
+          Track Your Application
         </h1>
-        <p className="text-white/60 text-sm max-w-md mx-auto">
-          Enter your unique Loan ID (e.g. <span className="font-mono text-white/90">HC-849204</span>) to check current review status and bank underwriter remarks.
+        <p className="text-white/50 text-sm max-w-md mx-auto leading-relaxed">
+          Enter your Loan ID (e.g. <span className="font-mono text-white/80">HC-849204</span>) to view your current review status and underwriter remarks.
         </p>
       </div>
 

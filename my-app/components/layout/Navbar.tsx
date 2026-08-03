@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/Button"
-import Magnet from "@/components/magnet"
+import Magnet from "@/components/special-effects/magnet"
 import { Menu, X, ArrowUpRight, BookOpen, Building2, ChartNoAxesColumn, Rocket, Sparkles, Users } from "lucide-react"
 import { useState, useEffect } from "react"
 import {

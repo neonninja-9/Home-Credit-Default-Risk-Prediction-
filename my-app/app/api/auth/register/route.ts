@@ -8,7 +8,7 @@ export async function POST(req: Request) {
 
     if (!name || !email || !password) {
       return NextResponse.json(
-        { message: "Missing required fields" },
+        { message: "Missing required fields (name, email, password)" },
         { status: 400 }
       )
     }
@@ -53,10 +53,10 @@ export async function POST(req: Request) {
       },
       { status: 201 }
     )
-  } catch (error) {
+  } catch (error: any) {
     console.error("Registration error:", error)
     return NextResponse.json(
-      { message: "Something went wrong" },
+      { message: error?.message || "Registration failed" },
       { status: 500 }
     )
   }

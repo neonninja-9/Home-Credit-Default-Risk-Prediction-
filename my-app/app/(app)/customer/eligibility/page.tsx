@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { CustomSelect } from "@/components/ui/Select";
 import {
   Sparkles,
   ShieldCheck,
@@ -47,9 +48,7 @@ export default function EligibilityCheck() {
     ownRealty: true,
   });
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e: any) => {
     const { name, value, type } = e.target;
     if (type === "checkbox") {
       const checked = (e.target as HTMLInputElement).checked;
@@ -226,51 +225,45 @@ export default function EligibilityCheck() {
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs text-white/70">Gender</label>
-                <select
-                  name="gender"
-                  value={formData.gender}
-                  onChange={handleChange}
-                  className="w-full h-10 px-3 rounded-md bg-canvas-dark border border-white/10 text-white text-sm focus:outline-none focus:border-dusk-violet"
-                >
-                  <option value="M">Male</option>
-                  <option value="F">Female</option>
-                  <option value="X">Other</option>
-                </select>
-              </div>
+              <CustomSelect
+                label="Gender"
+                name="gender"
+                value={formData.gender}
+                onChange={handleChange}
+                options={[
+                  { value: "M", label: "Male" },
+                  { value: "F", label: "Female" },
+                  { value: "X", label: "Other" },
+                ]}
+              />
 
-              <div className="space-y-1.5">
-                <label className="text-xs text-white/70">Marital Status</label>
-                <select
-                  name="maritalStatus"
-                  value={formData.maritalStatus}
-                  onChange={handleChange}
-                  className="w-full h-10 px-3 rounded-md bg-canvas-dark border border-white/10 text-white text-sm focus:outline-none focus:border-dusk-violet"
-                >
-                  <option value="Married">Married</option>
-                  <option value="Single / not married">Single</option>
-                  <option value="Civil marriage">Civil Marriage</option>
-                  <option value="Separated">Separated</option>
-                  <option value="Widow">Widow</option>
-                </select>
-              </div>
+              <CustomSelect
+                label="Marital Status"
+                name="maritalStatus"
+                value={formData.maritalStatus}
+                onChange={handleChange}
+                options={[
+                  { value: "Married", label: "Married" },
+                  { value: "Single / not married", label: "Single" },
+                  { value: "Civil marriage", label: "Civil Marriage" },
+                  { value: "Separated", label: "Separated" },
+                  { value: "Widow", label: "Widow" },
+                ]}
+              />
 
-              <div className="space-y-1.5">
-                <label className="text-xs text-white/70">Education</label>
-                <select
-                  name="education"
-                  value={formData.education}
-                  onChange={handleChange}
-                  className="w-full h-10 px-3 rounded-md bg-canvas-dark border border-white/10 text-white text-sm focus:outline-none focus:border-dusk-violet"
-                >
-                  <option value="Higher education">Higher Education / Degree</option>
-                  <option value="Secondary / secondary special">Secondary School</option>
-                  <option value="Incomplete higher">Incomplete Higher</option>
-                  <option value="Academic degree">Academic Degree (Masters/PhD)</option>
-                  <option value="Lower secondary">Lower Secondary</option>
-                </select>
-              </div>
+              <CustomSelect
+                label="Education"
+                name="education"
+                value={formData.education}
+                onChange={handleChange}
+                options={[
+                  { value: "Higher education", label: "Higher Education / Degree" },
+                  { value: "Secondary / secondary special", label: "Secondary School" },
+                  { value: "Incomplete higher", label: "Incomplete Higher" },
+                  { value: "Academic degree", label: "Academic Degree (Masters/PhD)" },
+                  { value: "Lower secondary", label: "Lower Secondary" },
+                ]}
+              />
             </div>
           </div>
 
@@ -281,20 +274,20 @@ export default function EligibilityCheck() {
               Employment & Household
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="space-y-1.5 md:col-span-2">
-                <label className="text-xs text-white/70">Employment Type</label>
-                <select
+              <div className="md:col-span-2">
+                <CustomSelect
+                  label="Employment Type"
                   name="employmentType"
                   value={formData.employmentType}
                   onChange={handleChange}
-                  className="w-full h-10 px-3 rounded-md bg-canvas-dark border border-white/10 text-white text-sm focus:outline-none focus:border-dusk-violet"
-                >
-                  <option value="Commercial associate">Commercial Associate</option>
-                  <option value="Working">Working / Private Sector</option>
-                  <option value="State servant">Public / Government Servant</option>
-                  <option value="Pensioner">Pensioner / Retired</option>
-                  <option value="Businessman">Business Owner</option>
-                </select>
+                  options={[
+                    { value: "Commercial associate", label: "Commercial Associate" },
+                    { value: "Working", label: "Working / Private Sector" },
+                    { value: "State servant", label: "Public / Government Servant" },
+                    { value: "Pensioner", label: "Pensioner / Retired" },
+                    { value: "Businessman", label: "Business Owner" },
+                  ]}
+                />
               </div>
 
               <div className="space-y-1.5">

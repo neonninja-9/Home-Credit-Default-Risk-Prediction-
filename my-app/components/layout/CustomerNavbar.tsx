@@ -7,12 +7,12 @@ import { Button } from "@/components/ui/Button"
 import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X, LogOut, User, Sparkles } from "lucide-react"
+import { Menu, X, LogOut } from "lucide-react"
 
 const CUSTOMER_LINKS = [
-  { href: "/customer", label: "Dashboard" },
-  { href: "/customer/eligibility", label: "Check Eligibility" },
-  { href: "/customer/status", label: "My Applications" },
+  { href: "/customer", label: "Home" },
+  { href: "/customer/eligibility", label: "Eligibility" },
+  { href: "/customer/status", label: "Applications" },
 ]
 
 export function CustomerNavbar() {
@@ -42,24 +42,16 @@ export function CustomerNavbar() {
             : "bg-transparent h-20 max-w-full w-full rounded-none mt-0 px-6 lg:px-20"
         )}
       >
-        <div className="flex items-center gap-3">
-          <Link href="/customer" className="flex items-center gap-2 mr-4">
-            <div className="w-8 h-8 rounded-lg bg-dusk-violet/20 border border-dusk-violet/40 flex items-center justify-center text-dusk-violet">
-              <Sparkles className="w-4 h-4" />
-            </div>
-            <span className="font-display font-semibold text-lg tracking-tight inline-flex animate-text-shine bg-[linear-gradient(110deg,#b5b5b5,45%,#ffffff,55%,#b5b5b5)] bg-[length:200%_100%] bg-clip-text text-transparent repeat-infinite">
+        <div className="flex items-center gap-6">
+          <Link href="/customer" className="flex items-center gap-2.5">
+            <span className="font-display font-bold text-lg tracking-tight inline-flex animate-text-shine bg-[linear-gradient(110deg,#b5b5b5,45%,#ffffff,55%,#b5b5b5)] bg-[length:200%_100%] bg-clip-text text-transparent repeat-infinite">
               CreditLens
             </span>
           </Link>
 
-          <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium uppercase tracking-wider bg-dusk-violet/15 text-dusk-violet border border-dusk-violet/30 mr-2">
-            <User className="w-3 h-3" />
-            Customer
-          </span>
-
           {/* Desktop Nav Items with Sliding Hover Pill */}
           <div
-            className="hidden md:flex items-center gap-1 relative"
+            className="hidden md:flex items-center gap-0.5 relative"
             onMouseLeave={() => setHoveredIndex(null)}
           >
             {CUSTOMER_LINKS.map((link, idx) => {
@@ -72,15 +64,14 @@ export function CustomerNavbar() {
                   href={link.href}
                   onMouseEnter={() => setHoveredIndex(idx)}
                   className={cn(
-                    "relative px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 z-10",
-                    isActive ? "text-bone" : "text-bone/70 hover:text-bone"
+                    "relative px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 z-10",
+                    isActive ? "text-bone" : "text-bone/60 hover:text-bone"
                   )}
                 >
-                  {/* Sliding hover pill across items */}
                   {isHovered && (
                     <motion.div
                       layoutId="customer-nav-hover-pill"
-                      className="absolute inset-0 bg-frosted-glass rounded-md z-[-1]"
+                      className="absolute inset-0 bg-frosted-glass rounded-lg z-[-1]"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
@@ -88,11 +79,10 @@ export function CustomerNavbar() {
                     />
                   )}
 
-                  {/* Active item highlight when not hovering over another item */}
                   {isActive && !isHovered && (
                     <motion.div
                       layoutId="customer-nav-active-pill"
-                      className="absolute inset-0 bg-frosted-glass rounded-md z-[-2] border border-white/5"
+                      className="absolute inset-0 bg-frosted-glass rounded-lg z-[-2] border border-white/5"
                       transition={{ type: "spring", bounce: 0.15, duration: 0.35 }}
                     />
                   )}
@@ -104,9 +94,13 @@ export function CustomerNavbar() {
           </div>
         </div>
 
-        {/* Desktop Logout Button */}
-        <div className="hidden md:flex items-center gap-3">
-          <Button variant="outline-dark" onClick={logout} className="hover:bg-frosted-glass text-xs h-9">
+        {/* Desktop Sign Out */}
+        <div className="hidden md:flex items-center">
+          <Button
+            variant="outline-dark"
+            onClick={logout}
+            className="hover:bg-frosted-glass text-xs h-9 rounded-lg border-hairline/60"
+          >
             <LogOut className="w-3.5 h-3.5 mr-1.5" />
             Sign Out
           </Button>
@@ -132,12 +126,7 @@ export function CustomerNavbar() {
             transition={{ duration: 0.2 }}
             className="pointer-events-auto fixed top-24 left-4 right-4 bg-graphite/95 backdrop-blur-xl border border-hairline rounded-2xl p-6 flex flex-col space-y-4 shadow-2xl z-40 md:hidden text-bone"
           >
-            <div className="flex items-center justify-between pb-3 border-b border-hairline">
-              <span className="text-xs uppercase tracking-wider text-slate font-medium">Customer Portal</span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] bg-dusk-violet/20 text-dusk-violet font-semibold">Borrower</span>
-            </div>
-
-            <div className="flex flex-col space-y-2">
+            <div className="flex flex-col space-y-1">
               {CUSTOMER_LINKS.map((link) => (
                 <Link
                   key={link.href}
@@ -155,7 +144,7 @@ export function CustomerNavbar() {
               ))}
             </div>
 
-            <div className="pt-4 border-t border-hairline">
+            <div className="pt-3 border-t border-hairline">
               <Button
                 variant="outline-dark"
                 onClick={() => {
@@ -165,7 +154,7 @@ export function CustomerNavbar() {
                 className="w-full flex items-center justify-center gap-2"
               >
                 <LogOut className="size-4" />
-                Log out
+                Sign out
               </Button>
             </div>
           </motion.div>

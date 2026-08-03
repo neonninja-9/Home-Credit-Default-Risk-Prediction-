@@ -11,7 +11,6 @@ import { Menu, X, LogOut, ShieldCheck, Building2, Layers } from "lucide-react"
 
 const BANK_LINKS = [
   { href: "/bank", label: "Applications Queue" },
-  { href: "/customer/prediction", label: "Run Risk Assessment" },
 ]
 
 export function BankNavbar() {
@@ -37,7 +36,7 @@ export function BankNavbar() {
           "pointer-events-auto text-bone flex items-center justify-between transition-all duration-500",
           "backdrop-blur-lg",
           isScrolled
-            ? "bg-[#0b101b]/90 h-14 max-w-[1050px] w-[calc(100%-2rem)] rounded-2xl mt-4 border border-accent-teal/20 px-6 lg:px-8 shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
+            ? "bg-black/80 h-14 max-w-[1050px] w-[calc(100%-2rem)] rounded-2xl mt-4 border border-accent-teal/20 px-6 lg:px-8 shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
             : "bg-transparent h-20 max-w-full w-full rounded-none mt-0 px-6 lg:px-20"
         )}
       >
@@ -56,10 +55,7 @@ export function BankNavbar() {
             </div>
           </Link>
 
-          <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium uppercase tracking-wider bg-accent-teal/15 text-accent-teal border border-accent-teal/30 mr-2">
-            <ShieldCheck className="w-3.5 h-3.5" />
-            Bank Staff
-          </span>
+
 
           {/* Desktop Nav Items with Sliding Hover Pill */}
           <div
@@ -138,7 +134,7 @@ export function BankNavbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="pointer-events-auto fixed top-24 left-4 right-4 bg-[#0b101b]/95 backdrop-blur-xl border border-accent-teal/30 rounded-2xl p-6 flex flex-col space-y-4 shadow-2xl z-40 md:hidden text-bone"
+            className="pointer-events-auto fixed top-24 left-4 right-4 bg-black/95 backdrop-blur-xl border border-accent-teal/30 rounded-2xl p-6 flex flex-col space-y-4 shadow-2xl z-40 md:hidden text-bone"
           >
             <div className="flex items-center justify-between pb-3 border-b border-white/10">
               <span className="text-xs uppercase tracking-wider text-slate font-medium">Bank Officer Portal</span>
