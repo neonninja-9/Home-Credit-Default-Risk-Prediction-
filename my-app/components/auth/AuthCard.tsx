@@ -7,7 +7,7 @@ import { signIn, getSession } from "next-auth/react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
-import { Mail, ArrowLeft, User, Building2, ShieldCheck, Sparkles } from "lucide-react"
+import { Mail, ArrowLeft, User, Building2, ShieldCheck, Sparkles, Lock, Eye, EyeOff } from "lucide-react"
 
 const GithubIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -32,16 +32,15 @@ interface AuthCardProps {
 
 type RoleType = "CUSTOMER" | "BANK_OFFICER"
 
-// Fluid spring configuration for buttery smooth natural motion
-const springTransition = {
+const spring = {
   type: "spring" as const,
-  stiffness: 280,
-  damping: 26,
-  mass: 0.8,
+  stiffness: 320,
+  damping: 30,
+  mass: 0.7,
 }
 
-const textTransition = {
-  duration: 0.24,
+const fadeSlide = {
+  duration: 0.22,
   ease: [0.16, 1, 0.3, 1] as const,
 }
 
@@ -54,10 +53,10 @@ export function AuthCard({ initialMode = "login" }: AuthCardProps) {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
-  // Detect role from URL query param if present
   useEffect(() => {
     const roleParam = searchParams.get("role")?.toLowerCase()
     if (roleParam === "bank" || roleParam === "bank_officer" || roleParam === "officer") {
@@ -128,7 +127,6 @@ export function AuthCard({ initialMode = "login" }: AuthCardProps) {
           throw new Error(res.error)
         }
 
-        // Fetch active session to check registered user role
         const session = await getSession()
         const userRole = (session?.user as any)?.role || role
         const destination = userRole === "BANK_OFFICER" ? "/bank" : "/customer"
@@ -143,9 +141,30 @@ export function AuthCard({ initialMode = "login" }: AuthCardProps) {
     }
   }
 
+  const isBank = role === "BANK_OFFICER"
+  const accentColor = isBank ? "accent-teal" : "dusk-violet"
+
   return (
-    <div className="relative w-full min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-void-canvas selection:bg-dusk-violet selection:text-white">
-      {/* Back to landing page button */}
+    <div className="relative w-full min-h-screen flex items-center justify-center px-4 py-16 bg-void-canvas selection:bg-dusk-violet selection:text-white">
+      {/* Ambient background glow */}
+      <div
+        className="pointer-events-none fixed inset-0 overflow-hidden"
+        aria-hidden="true"
+      >
+        <motion.div
+          key={role}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          className={`absolute top-[-20%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full blur-[160px] ${
+            isBank
+              ? "bg-accent-teal/[0.06]"
+              : "bg-dusk-violet/[0.06]"
+          }`}
+        />
+      </div>
+
+      {/* Back to landing */}
       <Link
         href="/"
         className="fixed top-6 left-6 sm:top-8 sm:left-8 inline-flex items-center gap-2 text-sm text-slate hover:text-bone transition-all duration-200 py-2 px-3.5 rounded-ui bg-graphite/40 hover:bg-graphite/80 border border-hairline/60 hover:border-hairline backdrop-blur-md group z-50 shadow-sm"
@@ -154,328 +173,345 @@ export function AuthCard({ initialMode = "login" }: AuthCardProps) {
         <span>Back to home</span>
       </Link>
 
-      {/* Outer Card with smooth layout expansion */}
+      {/* Main card */}
       <motion.div
         layout
-        transition={{
-          layout: springTransition,
-        }}
-        className="w-full max-w-[460px] mx-auto rounded-cards p-8 sm:p-9 bg-graphite border border-hairline text-bone shadow-[0_16px_56px_rgba(0,0,0,0.6)] overflow-hidden"
+        transition={{ layout: spring }}
+        className="relative w-full max-w-[440px] mx-auto overflow-hidden"
       >
-        {/* Role Switcher Tabs */}
-        <motion.div layout="position" transition={springTransition} className="mb-6">
-          <div className="flex p-1 bg-void-canvas/70 rounded-ui border border-hairline/80 relative">
-            <button
-              type="button"
-              onClick={() => handleRoleChange("CUSTOMER")}
-              className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 text-xs font-medium rounded-ui transition-colors duration-200 relative z-10 ${
-                role === "CUSTOMER" ? "text-bone" : "text-slate hover:text-bone/80"
-              }`}
-            >
-              <User className="w-3.5 h-3.5" />
-              <span>Customer Portal</span>
-              {role === "CUSTOMER" && (
-                <motion.div
-                  layoutId="active-role-pill"
-                  transition={springTransition}
-                  className="absolute inset-0 bg-dusk-violet/25 border border-dusk-violet/50 rounded-ui -z-10 shadow-sm"
-                />
-              )}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleRoleChange("BANK_OFFICER")}
-              className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 text-xs font-medium rounded-ui transition-colors duration-200 relative z-10 ${
-                role === "BANK_OFFICER" ? "text-bone" : "text-slate hover:text-bone/80"
-              }`}
-            >
-              <Building2 className="w-3.5 h-3.5" />
-              <span>Bank Staff Portal</span>
-              {role === "BANK_OFFICER" && (
-                <motion.div
-                  layoutId="active-role-pill"
-                  transition={springTransition}
-                  className="absolute inset-0 bg-accent-teal/20 border border-accent-teal/40 rounded-ui -z-10 shadow-sm"
-                />
-              )}
-            </button>
-          </div>
+        {/* Brand mark */}
+        <motion.div
+          layout="position"
+          transition={spring}
+          className="text-center mb-8"
+        >
+          <Link href="/" className="inline-block">
+            <span className="font-display font-bold text-xl tracking-tight inline-flex animate-text-shine bg-[linear-gradient(110deg,#b5b5b5,45%,#ffffff,55%,#b5b5b5)] bg-[length:200%_100%] bg-clip-text text-transparent">
+              CreditLens
+            </span>
+          </Link>
         </motion.div>
 
-        {/* Animated Header */}
-        <motion.div layout="position" transition={springTransition} className="relative mb-8 text-center min-h-[64px] flex flex-col justify-center">
-          <AnimatePresence mode="wait" initial={false}>
-            {mode === "login" ? (
-              <motion.div
-                key={`login-header-${role}`}
-                initial={{ opacity: 0, y: -8, filter: "blur(6px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, y: 8, filter: "blur(6px)" }}
-                transition={textTransition}
-                className="space-y-1.5"
+        {/* Card body */}
+        <motion.div
+          layout
+          transition={{ layout: spring }}
+          className="rounded-[20px] border border-hairline bg-graphite p-7 sm:p-9 shadow-[0_20px_60px_rgba(0,0,0,0.55)]"
+        >
+          {/* ── Role Switcher ── */}
+          <motion.div layout="position" transition={spring} className="mb-7">
+            <div className="flex p-1 bg-void-canvas/60 rounded-xl border border-hairline/60 relative">
+              <button
+                type="button"
+                onClick={() => handleRoleChange("CUSTOMER")}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 text-[13px] font-medium rounded-[10px] transition-colors duration-200 relative z-10 ${
+                  !isBank ? "text-bone" : "text-slate hover:text-bone/80"
+                }`}
               >
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium tracking-wide uppercase mb-1 bg-white/5 border border-white/10 text-slate">
-                  {role === "BANK_OFFICER" ? (
-                    <>
-                      <ShieldCheck className="w-3 h-3 text-accent-teal" />
-                      <span>Bank Underwriting</span>
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-3 h-3 text-dusk-violet" />
-                      <span>Borrower Access</span>
-                    </>
-                  )}
-                </div>
-                <h1 className="text-2xl sm:text-3xl font-display font-bold tracking-tight text-bone">
-                  {role === "BANK_OFFICER" ? "Bank Staff Sign In" : "Welcome back"}
-                </h1>
-                <p className="text-xs sm:text-sm text-slate">
-                  {role === "BANK_OFFICER"
-                    ? "Sign in to review and assess loan risk applications"
-                    : "Enter your credentials to access your customer dashboard"}
-                </p>
-              </motion.div>
-            ) : (
-              <motion.div
-                key={`signup-header-${role}`}
-                initial={{ opacity: 0, y: -8, filter: "blur(6px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, y: 8, filter: "blur(6px)" }}
-                transition={textTransition}
-                className="space-y-1.5"
-              >
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium tracking-wide uppercase mb-1 bg-white/5 border border-white/10 text-slate">
-                  {role === "BANK_OFFICER" ? (
-                    <>
-                      <ShieldCheck className="w-3 h-3 text-accent-teal" />
-                      <span>Bank Staff Registration</span>
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-3 h-3 text-dusk-violet" />
-                      <span>New Customer Account</span>
-                    </>
-                  )}
-                </div>
-                <h1 className="text-2xl sm:text-3xl font-display font-bold tracking-tight text-bone">
-                  {role === "BANK_OFFICER" ? "Register Bank Officer" : "Create an account"}
-                </h1>
-                <p className="text-xs sm:text-sm text-slate">
-                  {role === "BANK_OFFICER"
-                    ? "Register your officer credentials to start underwriting"
-                    : "Enter your details to check loan eligibility and apply"}
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
-
-        {/* Form with clean gaps and margins */}
-        <form onSubmit={onSubmit} className="w-full flex flex-col gap-4">
-          
-          {/* Full Name field with spring-based slide & height animation */}
-          <AnimatePresence initial={false}>
-            {mode === "signup" && (
-              <motion.div
-                key="name-field"
-                initial={{ opacity: 0, height: 0, y: -10, filter: "blur(4px)" }}
-                animate={{ opacity: 1, height: "auto", y: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, height: 0, y: -10, filter: "blur(4px)" }}
-                transition={{
-                  height: springTransition,
-                  opacity: { duration: 0.25 },
-                  y: springTransition,
-                  filter: { duration: 0.2 },
-                }}
-                className="overflow-hidden"
-              >
-                <div className="w-full py-0.5">
-                  <Input
-                    id="name"
-                    name="name"
-                    placeholder={role === "BANK_OFFICER" ? "Officer Name (e.g. Sarah Jenkins)" : "Full Name"}
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required={mode === "signup"}
-                    className="w-full bg-void-canvas/90 border-hairline focus-visible:border-dusk-violet focus-visible:ring-1 focus-visible:ring-dusk-violet text-bone placeholder:text-slate/60 text-sm h-11"
+                <User className="w-4 h-4" />
+                <span>Customer</span>
+                {!isBank && (
+                  <motion.div
+                    layoutId="active-role-pill"
+                    transition={spring}
+                    className="absolute inset-0 bg-dusk-violet/20 border border-dusk-violet/40 rounded-[10px] -z-10"
                   />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Email input with smooth position tracking */}
-          <motion.div layout="position" transition={springTransition} className="w-full py-0.5">
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              placeholder={role === "BANK_OFFICER" ? "officer@bank.com" : "name@example.com"}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full bg-void-canvas/90 border-hairline focus-visible:border-dusk-violet focus-visible:ring-1 focus-visible:ring-dusk-violet text-bone placeholder:text-slate/60 text-sm h-11"
-            />
-          </motion.div>
-
-          {/* Password input with smooth position tracking */}
-          <motion.div layout="position" transition={springTransition} className="w-full py-0.5">
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full bg-void-canvas/90 border-hairline focus-visible:border-dusk-violet focus-visible:ring-1 focus-visible:ring-dusk-violet text-bone placeholder:text-slate/60 text-sm h-11"
-            />
-          </motion.div>
-
-          {/* Error Message with spring animation */}
-          <AnimatePresence>
-            {error && (
-              <motion.div
-                initial={{ opacity: 0, height: 0, scale: 0.96 }}
-                animate={{ opacity: 1, height: "auto", scale: 1 }}
-                exit={{ opacity: 0, height: 0, scale: 0.96 }}
-                transition={{ duration: 0.2 }}
-                className="overflow-hidden"
-              >
-                <div className="p-3 text-xs text-rose-300 bg-rose-950/40 border border-rose-800/50 rounded-ui text-center">
-                  {error}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Submit Button */}
-          <motion.div layout="position" transition={springTransition} className="pt-2">
-            <Button
-              type="submit"
-              disabled={loading}
-              className={`w-full text-white font-medium h-11 transition-all duration-300 shadow-md ${
-                role === "BANK_OFFICER"
-                  ? "bg-accent-teal hover:bg-accent-teal/90 text-void-canvas font-semibold shadow-accent-teal/10"
-                  : "bg-dusk-violet hover:bg-dusk-violet/90 text-white shadow-dusk-violet/20"
-              }`}
-            >
-              <AnimatePresence mode="wait" initial={false}>
-                {loading ? (
-                  <motion.span
-                    key="loading"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.15 }}
-                  >
-                    Processing...
-                  </motion.span>
-                ) : mode === "login" ? (
-                  <motion.span
-                    key={`login-btn-${role}`}
-                    initial={{ opacity: 0, y: 4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -4 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {role === "BANK_OFFICER" ? "Access Bank Portal" : "Sign In with Email"}
-                  </motion.span>
-                ) : (
-                  <motion.span
-                    key={`signup-btn-${role}`}
-                    initial={{ opacity: 0, y: 4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -4 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {role === "BANK_OFFICER" ? "Register as Bank Staff" : "Create Customer Account"}
-                  </motion.span>
                 )}
-              </AnimatePresence>
-            </Button>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleRoleChange("BANK_OFFICER")}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 text-[13px] font-medium rounded-[10px] transition-colors duration-200 relative z-10 ${
+                  isBank ? "text-bone" : "text-slate hover:text-bone/80"
+                }`}
+              >
+                <Building2 className="w-4 h-4" />
+                <span>Bank Staff</span>
+                {isBank && (
+                  <motion.div
+                    layoutId="active-role-pill"
+                    transition={spring}
+                    className="absolute inset-0 bg-accent-teal/15 border border-accent-teal/35 rounded-[10px] -z-10"
+                  />
+                )}
+              </button>
+            </div>
           </motion.div>
-        </form>
 
-        {/* Social Login Section */}
-        <motion.div layout="position" transition={springTransition} className="w-full">
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-hairline" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-graphite px-3 text-slate">
-                Or continue with
-              </span>
-            </div>
-          </div>
+          {/* ── Heading ── */}
+          <motion.div
+            layout="position"
+            transition={spring}
+            className="mb-7 text-center"
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={`${mode}-${role}`}
+                initial={{ opacity: 0, y: -6, filter: "blur(5px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                exit={{ opacity: 0, y: 6, filter: "blur(5px)" }}
+                transition={fadeSlide}
+                className="space-y-2"
+              >
+                <h1 className="text-[26px] sm:text-[28px] font-display font-bold tracking-tight text-bone leading-tight">
+                  {mode === "login"
+                    ? isBank ? "Officer Sign In" : "Welcome back"
+                    : isBank ? "Officer Registration" : "Create your account"
+                  }
+                </h1>
+                <p className="text-[13px] text-slate leading-relaxed max-w-[300px] mx-auto">
+                  {mode === "login"
+                    ? isBank
+                      ? "Access the underwriting dashboard to review loan applications."
+                      : "Sign in to check eligibility, track applications, and more."
+                    : isBank
+                      ? "Set up your officer credentials to begin reviewing applications."
+                      : "Get started with instant AI-powered loan eligibility checks."
+                  }
+                </p>
+              </motion.div>
+            </AnimatePresence>
+          </motion.div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <Button
-              variant="outline"
-              type="button"
-              onClick={() => signIn("github", { callbackUrl: role === "BANK_OFFICER" ? "/bank" : "/customer" })}
-              className="bg-void-canvas/60 border-hairline hover:bg-void-canvas hover:border-slate/40 text-bone h-10 transition-colors duration-200"
-            >
-              <GithubIcon className="mr-2 h-4 w-4 fill-current" />
-              GitHub
-            </Button>
-            <Button
-              variant="outline"
-              type="button"
-              onClick={() => signIn("google", { callbackUrl: role === "BANK_OFFICER" ? "/bank" : "/customer" })}
-              className="bg-void-canvas/60 border-hairline hover:bg-void-canvas hover:border-slate/40 text-bone h-10 transition-colors duration-200"
-            >
-              <Mail className="mr-2 h-4 w-4" />
-              Google
-            </Button>
-          </div>
+          {/* ── Form ── */}
+          <form onSubmit={onSubmit} className="flex flex-col gap-5">
+            {/* Name (signup only) */}
+            <AnimatePresence initial={false}>
+              {mode === "signup" && (
+                <motion.div
+                  key="name-field"
+                  initial={{ opacity: 0, height: 0, y: -8, filter: "blur(3px)" }}
+                  animate={{ opacity: 1, height: "auto", y: 0, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, height: 0, y: -8, filter: "blur(3px)" }}
+                  transition={{
+                    height: spring,
+                    opacity: { duration: 0.2 },
+                    y: spring,
+                    filter: { duration: 0.15 },
+                  }}
+                  className="overflow-hidden"
+                >
+                  <div className="space-y-1.5">
+                    <label htmlFor="auth-name" className="block text-[12px] font-medium text-smoke uppercase tracking-wider">
+                      Full name
+                    </label>
+                    <Input
+                      id="auth-name"
+                      name="name"
+                      placeholder={isBank ? "e.g. Sarah Jenkins" : "e.g. John Doe"}
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required={mode === "signup"}
+                      className="w-full bg-void-canvas/80 border-hairline/80 focus-visible:border-dusk-violet focus-visible:ring-1 focus-visible:ring-dusk-violet text-bone placeholder:text-slate/50 text-sm h-11 rounded-xl"
+                    />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Email */}
+            <motion.div layout="position" transition={spring}>
+              <div className="space-y-1.5">
+                <label htmlFor="auth-email" className="block text-[12px] font-medium text-smoke uppercase tracking-wider">
+                  Email address
+                </label>
+                <Input
+                  id="auth-email"
+                  name="email"
+                  type="email"
+                  placeholder={isBank ? "officer@bank.com" : "you@example.com"}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="w-full bg-void-canvas/80 border-hairline/80 focus-visible:border-dusk-violet focus-visible:ring-1 focus-visible:ring-dusk-violet text-bone placeholder:text-slate/50 text-sm h-11 rounded-xl"
+                />
+              </div>
+            </motion.div>
+
+            {/* Password */}
+            <motion.div layout="position" transition={spring}>
+              <div className="space-y-1.5">
+                <label htmlFor="auth-password" className="block text-[12px] font-medium text-smoke uppercase tracking-wider">
+                  Password
+                </label>
+                <div className="relative">
+                  <Input
+                    id="auth-password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="w-full bg-void-canvas/80 border-hairline/80 focus-visible:border-dusk-violet focus-visible:ring-1 focus-visible:ring-dusk-violet text-bone placeholder:text-slate/50 text-sm h-11 rounded-xl pr-11"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate hover:text-bone transition-colors p-0.5"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Error */}
+            <AnimatePresence>
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0, scale: 0.97 }}
+                  animate={{ opacity: 1, height: "auto", scale: 1 }}
+                  exit={{ opacity: 0, height: 0, scale: 0.97 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden"
+                >
+                  <div className="px-4 py-3 text-[13px] text-rose-300 bg-rose-950/40 border border-rose-800/40 rounded-xl text-center leading-relaxed">
+                    {error}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Submit */}
+            <motion.div layout="position" transition={spring} className="pt-1">
+              <Button
+                type="submit"
+                disabled={loading}
+                className={`w-full font-semibold h-12 rounded-xl transition-all duration-300 shadow-lg text-[15px] ${
+                  isBank
+                    ? "bg-accent-teal hover:bg-accent-teal/90 text-void-canvas shadow-accent-teal/15"
+                    : "bg-dusk-violet hover:bg-dusk-violet/90 text-white shadow-dusk-violet/20"
+                }`}
+              >
+                <AnimatePresence mode="wait" initial={false}>
+                  {loading ? (
+                    <motion.span
+                      key="loading"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.12 }}
+                      className="inline-flex items-center gap-2"
+                    >
+                      <span className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
+                      Processing…
+                    </motion.span>
+                  ) : (
+                    <motion.span
+                      key={`${mode}-${role}`}
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      transition={{ duration: 0.18 }}
+                    >
+                      {mode === "login"
+                        ? isBank ? "Sign in to Bank Portal" : "Sign in"
+                        : isBank ? "Create Officer Account" : "Create account"
+                      }
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </Button>
+            </motion.div>
+          </form>
+
+          {/* ── Divider ── */}
+          <motion.div layout="position" transition={spring} className="my-7">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-hairline/60" />
+              </div>
+              <div className="relative flex justify-center">
+                <span className="bg-graphite px-4 text-[11px] uppercase tracking-widest text-slate/80">
+                  or
+                </span>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* ── Social logins ── */}
+          <motion.div layout="position" transition={spring}>
+            <div className="grid grid-cols-2 gap-3">
+              <Button
+                variant="outline"
+                type="button"
+                onClick={() => signIn("github", { callbackUrl: isBank ? "/bank" : "/customer" })}
+                className="bg-void-canvas/50 border-hairline/70 hover:bg-void-canvas hover:border-slate/30 text-bone h-11 rounded-xl transition-all duration-200 text-[13px] font-medium"
+              >
+                <GithubIcon className="mr-2 h-4 w-4 fill-current" />
+                GitHub
+              </Button>
+              <Button
+                variant="outline"
+                type="button"
+                onClick={() => signIn("google", { callbackUrl: isBank ? "/bank" : "/customer" })}
+                className="bg-void-canvas/50 border-hairline/70 hover:bg-void-canvas hover:border-slate/30 text-bone h-11 rounded-xl transition-all duration-200 text-[13px] font-medium"
+              >
+                <Mail className="mr-2 h-4 w-4" />
+                Google
+              </Button>
+            </div>
+          </motion.div>
+
+          {/* ── Footer mode toggle ── */}
+          <motion.div layout="position" transition={spring} className="mt-8 text-center">
+            <AnimatePresence mode="wait" initial={false}>
+              {mode === "login" ? (
+                <motion.p
+                  key="to-signup"
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.18 }}
+                  className="text-[13px] text-slate"
+                >
+                  New to CreditLens?{" "}
+                  <button
+                    type="button"
+                    onClick={() => toggleMode("signup")}
+                    className={`font-semibold hover:text-white underline underline-offset-4 decoration-hairline/50 hover:decoration-bone transition-all duration-200 cursor-pointer ${
+                      isBank ? "text-accent-teal" : "text-dusk-violet"
+                    }`}
+                  >
+                    Create an account
+                  </button>
+                </motion.p>
+              ) : (
+                <motion.p
+                  key="to-login"
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.18 }}
+                  className="text-[13px] text-slate"
+                >
+                  Already have an account?{" "}
+                  <button
+                    type="button"
+                    onClick={() => toggleMode("login")}
+                    className={`font-semibold hover:text-white underline underline-offset-4 decoration-hairline/50 hover:decoration-bone transition-all duration-200 cursor-pointer ${
+                      isBank ? "text-accent-teal" : "text-dusk-violet"
+                    }`}
+                  >
+                    Sign in
+                  </button>
+                </motion.p>
+              )}
+            </AnimatePresence>
+          </motion.div>
         </motion.div>
 
-        {/* Footer Mode Switcher */}
-        <motion.div layout="position" transition={springTransition} className="mt-8 text-center text-xs text-slate">
-          <AnimatePresence mode="wait" initial={false}>
-            {mode === "login" ? (
-              <motion.span
-                key="to-signup"
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                transition={{ duration: 0.2 }}
-                className="inline-block"
-              >
-                Don&apos;t have an account?{" "}
-                <button
-                  type="button"
-                  onClick={() => toggleMode("signup")}
-                  className="font-medium text-bone hover:text-white underline underline-offset-4 decoration-hairline hover:decoration-bone transition-all duration-200 ml-1 cursor-pointer"
-                >
-                  Sign up
-                </button>
-              </motion.span>
-            ) : (
-              <motion.span
-                key="to-login"
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                transition={{ duration: 0.2 }}
-                className="inline-block"
-              >
-                Already have an account?{" "}
-                <button
-                  type="button"
-                  onClick={() => toggleMode("login")}
-                  className="font-medium text-bone hover:text-white underline underline-offset-4 decoration-hairline hover:decoration-bone transition-all duration-200 ml-1 cursor-pointer"
-                >
-                  Sign in
-                </button>
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </motion.div>
+        {/* Trust line beneath card */}
+        <motion.p
+          layout="position"
+          transition={spring}
+          className="text-center text-[11px] text-slate/60 mt-6 leading-relaxed"
+        >
+          Secured with end-to-end encryption · Your data is never shared
+        </motion.p>
       </motion.div>
     </div>
   )
