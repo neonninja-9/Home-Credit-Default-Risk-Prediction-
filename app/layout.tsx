@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { CursorFollower } from "@/components/ui/cursor-follower";
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist' });
 
@@ -32,6 +33,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
+            <CursorFollower />
             {children}
           </AuthProvider>
         </ThemeProvider>

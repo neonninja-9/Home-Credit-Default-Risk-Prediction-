@@ -304,7 +304,7 @@ const ScrollExpandMedia = ({
                 <div className='flex flex-col items-center text-center relative z-10 mt-4 transition-none'>
                   {date && (
                     <motion.p
-                      className='text-2xl text-blue-200'
+                      className='text-2xl text-bone/60 font-medium tracking-widest uppercase'
                       style={{ x: negTextTranslateX }}
                     >
                       {date}
@@ -312,7 +312,7 @@ const ScrollExpandMedia = ({
                   )}
                   {scrollToExpand && (
                     <motion.p
-                      className='text-blue-200 font-medium text-center'
+                      className='text-bone/40 font-medium text-center text-sm tracking-wider'
                       style={{ x: posTextTranslateX }}
                     >
                       {scrollToExpand}
@@ -325,18 +325,18 @@ const ScrollExpandMedia = ({
                 className={`flex items-center justify-center text-center gap-4 w-full relative z-10 transition-none flex-col ${textBlend ? 'mix-blend-difference' : 'mix-blend-normal'
                   }`}
               >
-                <motion.h2
-                  className='text-4xl md:text-5xl lg:text-6xl font-bold text-blue-200 transition-none'
+                <motion.h1
+                  className='text-6xl md:text-8xl lg:text-9xl font-display font-black tracking-tighter bg-gradient-to-b from-bone via-bone/90 to-dusk-violet/60 bg-clip-text text-transparent transition-none drop-shadow-[0_0_40px_rgba(107,98,242,0.15)]'
                   style={{ x: negTextTranslateX }}
                 >
                   {firstWord}
-                </motion.h2>
-                <motion.h2
-                  className='text-4xl md:text-5xl lg:text-6xl font-bold text-center text-blue-200 transition-none'
+                </motion.h1>
+                <motion.h1
+                  className='text-6xl md:text-8xl lg:text-9xl font-display font-black tracking-tighter text-center bg-gradient-to-b from-bone via-bone/90 to-dusk-violet/60 bg-clip-text text-transparent transition-none drop-shadow-[0_0_40px_rgba(107,98,242,0.15)]'
                   style={{ x: posTextTranslateX }}
                 >
                   {restOfTitle}
-                </motion.h2>
+                </motion.h1>
               </div>
             </div>
 
