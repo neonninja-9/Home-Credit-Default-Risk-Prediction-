@@ -4,6 +4,7 @@ import React, { useRef, useState, useEffect, ReactNode, cloneElement, isValidEle
 import { motion, useScroll, useTransform, useSpring, MotionValue, useMotionValue, useMotionValueEvent } from 'framer-motion';
 import Image from 'next/image';
 import { useScrollExpandStore } from '@/hooks/useScrollExpandStore';
+import StrokeText from '@/components/special-effects/StrokeText';
 
 export const ScrollProgressContext = createContext<MotionValue<number> | null>(null);
 
@@ -322,21 +323,63 @@ const ScrollExpandMedia = ({
               </motion.div>
 
               <div
-                className={`flex items-center justify-center text-center gap-4 w-full relative z-10 transition-none flex-col ${textBlend ? 'mix-blend-difference' : 'mix-blend-normal'
+                className={`flex items-center justify-center text-center -space-y-3 md:-space-y-6 w-full relative z-10 transition-none flex-col ${textBlend ? 'mix-blend-difference' : 'mix-blend-normal'
                   }`}
               >
-                <motion.h1
-                  className='text-6xl md:text-8xl lg:text-9xl font-display font-black tracking-tighter bg-gradient-to-b from-bone via-bone/90 to-dusk-violet/60 bg-clip-text text-transparent transition-none drop-shadow-[0_0_40px_rgba(107,98,242,0.15)]'
+                <motion.div
+                  className='w-full flex justify-center transition-none drop-shadow-[0_0_35px_rgba(107,98,242,0.25)]'
                   style={{ x: negTextTranslateX }}
                 >
-                  {firstWord}
-                </motion.h1>
-                <motion.h1
-                  className='text-6xl md:text-8xl lg:text-9xl font-display font-black tracking-tighter text-center bg-gradient-to-b from-bone via-bone/90 to-dusk-violet/60 bg-clip-text text-transparent transition-none drop-shadow-[0_0_40px_rgba(107,98,242,0.15)]'
+                  <StrokeText
+                    text={firstWord}
+                    strokeColor="#c084fc"
+                    fillGradient={{
+                      from: "#ffffff",
+                      via: "#f8fafc",
+                      to: "#c4b5fd"
+                    }}
+                    strokeWidth={1.6}
+                    drawDuration={1.8}
+                    fillDelay={0.25}
+                    stagger={0.05}
+                    ease="power3.out"
+                    trigger="mount"
+                    fillMode="wipe"
+                    fontSize={isMobileState ? 72 : 135}
+                    fontWeight={900}
+                    fontFamily="var(--font-dm-sans), sans-serif"
+                    letterSpacing={-5}
+                    glow={true}
+                    glowColor="rgba(192, 132, 252, 0.45)"
+                  />
+                </motion.div>
+                <motion.div
+                  className='w-full flex justify-center transition-none drop-shadow-[0_0_35px_rgba(107,98,242,0.25)]'
                   style={{ x: posTextTranslateX }}
                 >
-                  {restOfTitle}
-                </motion.h1>
+                  <StrokeText
+                    text={restOfTitle}
+                    strokeColor="#c084fc"
+                    fillGradient={{
+                      from: "#ffffff",
+                      via: "#f8fafc",
+                      to: "#c4b5fd"
+                    }}
+                    strokeWidth={1.6}
+                    drawDuration={1.8}
+                    fillDelay={0.25}
+                    stagger={0.05}
+                    ease="power3.out"
+                    trigger="mount"
+                    fillMode="wipe"
+                    fontSize={isMobileState ? 72 : 135}
+                    fontWeight={900}
+                    fontFamily="var(--font-dm-sans), sans-serif"
+                    letterSpacing={-5}
+                    glow={true}
+                    glowColor="rgba(192, 132, 252, 0.45)"
+                  />
+                </motion.div>
               </div>
             </div>
 
